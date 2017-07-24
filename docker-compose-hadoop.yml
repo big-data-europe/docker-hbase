@@ -1,0 +1,82 @@
+version: "2"
+
+services:
+  #######
+  # DFS #
+  #######
+  namenode:
+    image: bde2020/hadoop-namenode:1.2.0-hadoop2.8-java8
+    container_name: namenode
+    networks:
+      - hbase
+    volumes:
+      - ./data/hadoop/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    ports:
+      - "50070:50070"
+    env_file:
+      - ./hadoop.env
+
+  datanode1:
+    image: bde2020/hadoop-datanode:1.2.0-hadoop2.8-java8
+    container_name: datanode1
+    networks:
+      - hbase
+    depends_on:
+      - namenode
+    volumes:
+      - ./data/hadoop/datanode1:/hadoop/dfs/data
+    ports:
+      - "50075:50075"
+    env_file:
+      - ./hadoop.env
+
+  ########
+  # YARN #
+  ########
+
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:1.2.0-hadoop2.8-java8
+    container_name: resourcemanager
+    networks:
+      - hbase
+    depends_on:
+      - namenode
+      - datanode1
+    ports:
+      - "8088:8088"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager:1.2.0-hadoop2.8-java8
+    container_name: nodemanager1
+    networks:
+      - hbase
+    depends_on:
+      - namenode
+      - datanode1
+    ports:
+      - "8042:8042"
+    env_file:
+      - ./hadoop.env
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:1.2.0-hadoop2.8-java8
+    container_name: historyserver
+    networks:
+      - hbase
+    depends_on:
+      - namenode
+      - datanode1
+    volumes:
+      - ./data/hadoop/historyserver:/hadoop/yarn/timeline
+    ports:
+      - "8188:8188"
+    env_file:
+      - ./hadoop.env
+
+networks:
+  hbase:
+    external: true
