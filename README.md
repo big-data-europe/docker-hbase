@@ -12,5 +12,9 @@ Can be used for testing/development, does not connect to Hadoop cluster.
 # Pseudo-distributed
 To run pseudo-distributed hbase:
 ```
-
+make network
+make run-pseudo-distributed-hadoop
 ```
+This will start up a local hadoop cluster, see [docker-compose-hadoop.yml](./docker-compose-hadoop.yml) for details.
+HBase will store its' data in hdfs://namenode:9000 and use external zookeeper.
+Both HMaster and HRegion servers will run in the same docker container (hbase).
