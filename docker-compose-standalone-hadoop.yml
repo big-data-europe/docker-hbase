@@ -14,26 +14,20 @@ services:
       - 60010:60010
       - 60020:60020
       - 60030:60030
+      - 2888:2888
+      - 3888:3888
+      - 2181:2181
     environment:
-      - HBASE_CONF_hbase_rootdir=hdfs://namenode:9000/hbase
+      - HBASE_CONF_hbase_rootdir=hdfs://namenode:9000/hbase2
       - HBASE_CONF_hbase_zookeeper_property_dataDir=/zookeeper-data
-      - HBASE_CONF_hbase_cluster_distributed=true
-      - HBASE_CONF_hbase_zookeeper_quorum=zookeeper
+      - HBASE_CONF_hbase_zookeeper_quorum=localhost
       - HBASE_CONF_hbase_master_port=60000
       - HBASE_CONF_hbase_master_info_port=60010
       - HBASE_CONF_hbase_regionserver_port=60020
       - HBASE_CONF_hbase_regionserver_info_port=60030
-      - HBASE_MANAGES_ZK=false
-  zookeeper:
-    image: zookeeper:3.4
-    container_name: zookeeper
-    networks:
-      - hbase
-    ports:
-      - 2181:2181
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      - HBASE_CONF_hbase_zookeeper_peerport=2888
+      - HBASE_CONF_hbase_zookeeper_leaderport=3888
+      - HBASE_CONF_hbase_zookeeper_property_clientPort=2181
 
 networks:
   hbase:

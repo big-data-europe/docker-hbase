@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Set some sensible defaults
-export CORE_CONF_fs_defaultFS=${CORE_CONF_fs_defaultFS:-hdfs://`hostname -f`:8020}
-
 function addProperty() {
   local path=$1
   local name=$2
@@ -20,9 +17,9 @@ function configure() {
 
     local var
     local value
-    
+
     echo "Configuring $module"
-    for c in `printenv | perl -sne 'print "$1 " if m/^${envPrefix}_(.+?)=.*/' -- -envPrefix=$envPrefix`; do 
+    for c in `printenv | perl -sne 'print "$1 " if m/^${envPrefix}_(.+?)=.*/' -- -envPrefix=$envPrefix`; do
         name=`echo ${c} | perl -pe 's/___/-/g; s/__/_/g; s/_/./g'`
         var="${envPrefix}_${c}"
         value=${!var}
@@ -32,5 +29,23 @@ function configure() {
 }
 
 configure /etc/hbase/hbase-site.xml hbase HBASE_CONF
+
+function setRegionServers() {
+  cat > /etc/hbase/regionservers
+  for regionServer in $REGION_SERVERS; do
+    echo $regionServer >> /etc/hbase/regionservers
+  done
+}
+
+setRegionServers
+
+function setBackupMasters() {
+  cat > /etc/hbase/backup-masters
+  for backupMaster in $BACKUP_MASTERS; do
+    echo $backupMaster >> /etc/hbase/backup-masters
+  done
+}
+
+setBackupMasters
 
 exec $@

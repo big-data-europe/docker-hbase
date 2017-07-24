@@ -1,0 +1,52 @@
+version: "2"
+
+services:
+  hbase-master:
+    image: bde2020/hbase-master:1.0.0-hbase1.2.6
+    container_name: hbase-master
+    networks:
+      - hbase
+    ports:
+      - 60000:60000
+      - 60010:60010
+    env_file:
+      - ./hbase.env
+  hbase-regionserver:
+    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    container_name: hbase-regionserver
+    networks:
+      - hbase
+    ports:
+      - 60020:60020
+      - 60030:60030
+    env_file:
+      - ./hbase.env
+  zoo1:
+      image: zookeeper
+      restart: always
+      networks:
+        - hbase
+      environment:
+          ZOO_MY_ID: 1
+          ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+  zoo2:
+      image: zookeeper
+      restart: always
+      networks:
+        - hbase
+      environment:
+          ZOO_MY_ID: 2
+          ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+  zoo3:
+      image: zookeeper
+      restart: always
+      networks:
+        - hbase
+      environment:
+          ZOO_MY_ID: 3
+          ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+
+
+networks:
+  hbase:
+    external: true
