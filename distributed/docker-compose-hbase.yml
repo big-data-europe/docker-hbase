@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  hbase-master:
+    image: bde2020/hbase-master:1.0.0-hbase1.2.6
+    networks:
+      - hbase
+    ports:
+      - 60000:60000
+      - 60010:60010
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - ./hbase.env
+  hbase-regionserver:
+    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    networks:
+      - hbase
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - ./hbase.env
+
+
+networks:
+  hbase:
+    external: true

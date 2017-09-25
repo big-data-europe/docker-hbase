@@ -3,6 +3,11 @@
 network:
 	docker network create hbase
 
+build:
+	docker build -t bde2020/hbase-base:1.0.0-hbase1.2.6 ./base
+	docker build -t bde2020/hbase-master:1.0.0-hbase1.2.6 ./hmaster
+	docker build -t bde2020/hbase-regionserver:1.0.0-hbase1.2.6 ./hregionserver
+
 base:
 	docker build -t bde2020/hbase-base:1.0.0-hbase1.2.6 ./base
 
