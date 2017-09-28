@@ -1,16 +1,19 @@
-version: "2"
+version: "3"
 
 services:
+  ###########################################
+  # Use Makefile to deploy Hadoop with YARN #
+  ###########################################
+
   #######
   # DFS #
   #######
   namenode:
-    image: bde2020/hadoop-namenode:1.2.0-hadoop2.8-java8
-    container_name: namenode
+    image: bde2020/hadoop-namenode:1.2.0-hadoop2.7.4-java8
     networks:
       - hbase
     volumes:
-      - ./data/hadoop/namenode:/hadoop/dfs/name
+      - namenode:/hadoop/dfs/name
     environment:
       - CLUSTER_NAME=test
     ports:
@@ -19,14 +22,13 @@ services:
       - ./hadoop.env
 
   datanode1:
-    image: bde2020/hadoop-datanode:1.2.0-hadoop2.8-java8
-    container_name: datanode1
+    image: bde2020/hadoop-datanode:1.2.0-hadoop2.7.4-java8
     networks:
       - hbase
     depends_on:
       - namenode
     volumes:
-      - ./data/hadoop/datanode1:/hadoop/dfs/data
+      - datanode1:/hadoop/dfs/data
     ports:
       - "50075:50075"
     env_file:
@@ -37,45 +39,39 @@ services:
   ########
 
   resourcemanager:
-    image: bde2020/hadoop-resourcemanager:1.2.0-hadoop2.8-java8
-    container_name: resourcemanager
+    image: bde2020/hadoop-resourcemanager:1.2.0-hadoop2.7.4-java8
     networks:
       - hbase
-    depends_on:
-      - namenode
-      - datanode1
     ports:
       - "8088:8088"
     env_file:
       - ./hadoop.env
 
   nodemanager1:
-    image: bde2020/hadoop-nodemanager:1.2.0-hadoop2.8-java8
-    container_name: nodemanager1
+    image: bde2020/hadoop-nodemanager:1.2.0-hadoop2.7.4-java8
     networks:
       - hbase
-    depends_on:
-      - namenode
-      - datanode1
     ports:
       - "8042:8042"
     env_file:
       - ./hadoop.env
 
   historyserver:
-    image: bde2020/hadoop-historyserver:1.2.0-hadoop2.8-java8
-    container_name: historyserver
+    image: bde2020/hadoop-historyserver:1.2.0-hadoop2.7.4-java8
     networks:
       - hbase
-    depends_on:
-      - namenode
-      - datanode1
     volumes:
-      - ./data/hadoop/historyserver:/hadoop/yarn/timeline
+      - historyserver:/hadoop/yarn/timeline
     ports:
       - "8188:8188"
     env_file:
       - ./hadoop.env
+
+volumes:
+  historyserver:
+  namenode:
+  datanode1:
+
 
 networks:
   hbase:

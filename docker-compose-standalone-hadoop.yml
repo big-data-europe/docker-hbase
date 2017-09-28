@@ -18,7 +18,7 @@ services:
       - 3888:3888
       - 2181:2181
     environment:
-      - HBASE_CONF_hbase_rootdir=hdfs://namenode:9000/hbase2
+      - HBASE_CONF_hbase_rootdir=hdfs://namenode:9000/hbase
       - HBASE_CONF_hbase_zookeeper_property_dataDir=/zookeeper-data
       - HBASE_CONF_hbase_zookeeper_quorum=localhost
       - HBASE_CONF_hbase_master_port=60000

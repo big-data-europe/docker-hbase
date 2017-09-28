@@ -1,4 +1,30 @@
 .PHONY: all test clean
+DOCKER_NETWORK = hbase
+ENV_FILE = hadoop.env
+current_branch := 1.2.0-hadoop2.7.4-java8
+
+start-up: namenode datanode resourcemanager nodemanager historyserver
+
+namenode:
+	mkdir -p $(shell pwd)/data/namenode
+	docker service create --env-file ./hadoop.env --publish 50070:50070 --mount type=bind,src=$(shell pwd)/data/namenode,dst=/hadoop/dfs/name -e CLUSTER_NAME=test --network hbase --name namenode bde2020/hadoop-namenode:1.2.0-hadoop2.7.4-java8
+	sleep 60
+
+datanode:
+	mkdir -p $(shell pwd)/data/datanode
+	docker service create --env-file ./hadoop.env --publish 50075:50075 --mount type=bind,source=$(shell pwd)/data/datanode,destination=/hadoop/dfs/data --network hbase --name datanode bde2020/hadoop-datanode:1.2.0-hadoop2.7.4-java8
+	sleep 20
+
+nodemanager:
+	docker service create --env-file ./hadoop.env --publish 8042:8042 --network hbase --name nodemanager bde2020/hadoop-nodemanager:1.2.0-hadoop2.7.4-java8
+	sleep 60
+
+resourcemanager:
+	docker service create --env-file ./hadoop.env --publish 8088:8088 --network hbase --name resourcemanager bde2020/hadoop-resourcemanager:1.2.0-hadoop2.7.4-java8
+
+historyserver:
+	mkdir -p $(shell pwd)/data/historyserver
+	docker service create --env-file ./hadoop.env --publish 8188:8188 --mount type=bind,source=$(shell pwd)/data/historyserver,destination=/hadoop/yarn/timeline --network hbase --name historyserver bde2020/hadoop-historyserver:1.2.0-hadoop2.7.4-java8
 
 network:
 	docker network create hbase
@@ -36,3 +62,12 @@ run-distributed-hadoop: base
 
 run-zookeeper:
 	docker-compose -f docker-compose-zookeeper.yml up -d
+
+wordcount:
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -mkdir -p /input/
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -copyFromLocal -f /opt/hadoop-2.7.4/README.txt /input/
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r -f /output
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-submit:$(current_branch)
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -cat /output/*
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /output
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /input
