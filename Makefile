@@ -26,6 +26,12 @@ historyserver:
 	mkdir -p $(shell pwd)/data/historyserver
 	docker service create --env-file ./hadoop.env --publish 8188:8188 --mount type=bind,source=$(shell pwd)/data/historyserver,destination=/hadoop/yarn/timeline --network hbase --name historyserver bde2020/hadoop-historyserver:1.2.0-hadoop2.7.4-java8
 
+hbase:
+	mkdir -p $(shell pwd)/data/hbase
+	mkdir -p $(shell pwd)/data/zookeeper
+	docker service create --env-file ./hbase.env --publish 60000:60000 --publish 60010:60010 --publish 60020:60020 --publish 60030:60030 --publish 2888:2888 --publish 3888:3888 --publish 2181:2181 --mount type=bind,source=$(shell pwd)/data/hbase,destination=/hbase-data --mount type=bind,source=$(shell pwd)/data/zookeeper,destination=/zookeeper-data --network hbase --name hbase bde2020/hbase-standalone:1.0.0-hbase1.2.6
+
+
 network:
 	docker network create hbase
 
@@ -71,3 +77,6 @@ wordcount:
 	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -cat /output/*
 	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /output
 	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /input
+
+hbase-shell:
+	docker run -it --rm --network ${DOCKER_NETWORK} --env-file ./hbase.env bde2020/hbase-standalone:1.0.0-hbase1.2.6 hbase shell
