@@ -1,14 +1,58 @@
-version: "2"
+version: "3"
 
 services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    container_name: namenode
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    container_name: datanode
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070"
+    env_file:
+      - ./hadoop.env
+
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop2.7.4-java8
+    container_name: resourcemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop2.7.4-java8
+    container_name: nodemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop2.7.4-java8
+    container_name: historyserver
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+
   hbase:
     image: bde2020/hbase-standalone:1.0.0-hbase1.2.6
     container_name: hbase
-    networks:
-      - hbase
     volumes:
-      - ./data/hbase:/hbase-data
-      - ./data/zookeeper:/zookeeper-data
+      - hbase_data:/hbase-data
+      - hbase_zookeeper_data:/zookeeper-data
     ports:
       - 60000:60000
       - 60010:60010
@@ -18,16 +62,13 @@ services:
       - 3888:3888
       - 2181:2181
     environment:
-      - HBASE_CONF_hbase_rootdir=/hbase-data
-      - HBASE_CONF_hbase_zookeeper_property_dataDir=/zookeeper-data
-      - HBASE_CONF_hbase_master_port=60000
-      - HBASE_CONF_hbase_master_info_port=60010
-      - HBASE_CONF_hbase_regionserver_port=60020
-      - HBASE_CONF_hbase_regionserver_info_port=60030
-      - HBASE_CONF_hbase_zookeeper_peerport=2888
-      - HBASE_CONF_hbase_zookeeper_leaderport=3888
-      - HBASE_CONF_hbase_zookeeper_property_clientPort=2181
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075"
+    env_file:
+      - ./hbase.env
 
-networks:
-  hbase:
-    external: true
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
+  hbase_data:
+  hbase_zookeeper_data:
