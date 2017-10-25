@@ -19,9 +19,9 @@ hadoop:
 hbase:
 	docker stack deploy -c docker-compose-hbase.yml hbase
 
-hmaster-service:
-	docker service create --name hmaster --network hbase --constraint node.hostname==akswnc4.aksw.uni-leipzig.de bde2020/hbase-master:1.0.0-hbase1.2.6
-
 hmaster-run:
-	docker run -it --rm --name hmaster --network hbase --env-file ./hbase.env bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+	docker service create --detach=false -t --constraint node.hostname==akswnc4.aksw.uni-leipzig.de --hostname hmaster --name hmaster --network hbase --env-file ./hbase.env --label traefik.docker.network=hbase --label traefik.port=60010 bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+
+hregion-run:
+	docker run -it --rm --name hregion --network hbase --env-file ./hbase.env --label traefik.docker.network=hbase --label traefik.port=60030 bde2020/hbase-hregion:1.0.0-hbase1.2.6
 

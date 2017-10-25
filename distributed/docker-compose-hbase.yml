@@ -3,6 +3,8 @@ version: '3'
 services:
   hbase-master:
     image: bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+    networks:
+      - hbase
     deploy:
       mode: replicated
       replicas: 1
@@ -19,9 +21,16 @@ services:
 
   hbase-regionserver:
     image: bde2020/hbase-hregionserver:1.0.0-hbase1.2.6
+    networks:
+      - hbase
     deploy:
       mode: global
       restart_policy:
         condition: on-failure
     env_file:
       - ./hbase.env
+
+networks:
+  hbase:
+    external:
+      name: hbase
