@@ -19,9 +19,12 @@ hadoop:
 hbase:
 	docker stack deploy -c docker-compose-hbase.yml hbase
 
-hmaster-run:
-	docker service create --detach=false -t --constraint node.hostname==akswnc4.aksw.uni-leipzig.de --hostname hmaster --name hmaster --network hbase --env-file ./hbase.env --label traefik.docker.network=hbase --label traefik.port=60010 bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+hbase-master-bash:
+	docker run -it --rm -p 60010:60010 --network hbase --hostname hbase-master --name hbase-master --env-file ./hbase-local.env bde2020/hbase-base:1.0.0-hbase1.2.6 bash /opt/hbase-1.2.6/bin/hbase master start
 
-hregion-run:
-	docker run -it --rm --name hregion --network hbase --env-file ./hbase.env --label traefik.docker.network=hbase --label traefik.port=60030 bde2020/hbase-hregion:1.0.0-hbase1.2.6
+hbase-region-bash:
+	docker run -it --rm -p 60030:60030 --network hbase --env-file ./hbase-local.env --name hbase-region --hostname hbase-region -e HBASE_CONF_hbase_regionserver_hostname=hbase-region bde2020/hbase-base:1.0.0-hbase1.2.6 /opt/hbase-1.2.6/bin/hbase regionserver start
 
+clean:
+	docker exec -it namenode hadoop fs -rm -r /hbase/*
+	docker exec -it zoo bash # bin/zkCli.sh && echo "rmr /hbase"

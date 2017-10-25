@@ -30,24 +30,6 @@ function configure() {
 
 configure /etc/hbase/hbase-site.xml hbase HBASE_CONF
 
-function setRegionServers() {
-  cat > /etc/hbase/regionservers
-  for regionServer in $REGION_SERVERS; do
-    echo $regionServer >> /etc/hbase/regionservers
-  done
-}
-
-setRegionServers
-
-function setBackupMasters() {
-  cat > /etc/hbase/backup-masters
-  for backupMaster in $BACKUP_MASTERS; do
-    echo $backupMaster >> /etc/hbase/backup-masters
-  done
-}
-
-setBackupMasters
-
 function wait_for_it()
 {
     local serviceport=$1
