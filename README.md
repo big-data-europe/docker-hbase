@@ -3,18 +3,18 @@
 # Standalone
 To run standalone hbase:
 ```
-make network
-make run-standalone
+docker-compose -f docker-compose-standalone.yml up -d
 ```
-HBase data is written to the folder ./data/hbase, zookeeper data is written to ./data/zookeeper. The deployment is the same as in [quickstart HBase documentation](https://hbase.apache.org/book.html#quickstart).
-Can be used for testing/development, does not connect to Hadoop cluster.
+The deployment is the same as in [quickstart HBase documentation](https://hbase.apache.org/book.html#quickstart).
+Can be used for testing/development, connected to Hadoop cluster.
 
-# Standalone with Hadoop
-To run standalone hbase with hadoop:
+# Local distributed
+To run local distributed hbase:
 ```
-make network
-make run-standalone-hadoop
+docker-compose -f docker-compose-distributed-local.yml up -d
 ```
+
+This deployment will start Zookeeper, HMaster and HRegionserver in separate containers.
 
 # Distributed
 To run distributed hbase on docker swarm see this [doc](./distributed/README.md):
