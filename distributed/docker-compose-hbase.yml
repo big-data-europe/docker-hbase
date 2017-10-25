@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  hbase-master:
+    image: bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc4.aksw.uni-leipzig.de
+      labels:
+        traefik.docker.network: hbase
+        traefik.port: 60010
+    env_file:
+      - ./hbase.env
+
+  hbase-regionserver:
+    image: bde2020/hbase-hregionserver:1.0.0-hbase1.2.6
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - ./hbase.env

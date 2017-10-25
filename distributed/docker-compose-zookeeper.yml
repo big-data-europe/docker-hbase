@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  zoo1:
+    image: zookeeper:3.4.10
+    networks:
+      - hbase
+    volumes:
+      - zoo1_data:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc4.aksw.uni-leipzig.de
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+  zoo2:
+    image: zookeeper:3.4.10
+    networks:
+      - hbase
+    volumes:
+      - zoo2_data:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc5.aksw.uni-leipzig.de
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
+  zoo3:
+    image: zookeeper:3.4.10
+    networks:
+      - hbase
+    volumes:
+      - zoo3_data:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc6.aksw.uni-leipzig.de
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
+
+volumes:
+  zoo1_data:
+  zoo2_data:
+  zoo3_data:
+
+networks:
+  hbase: 
+    external: 
+      name: hbase
