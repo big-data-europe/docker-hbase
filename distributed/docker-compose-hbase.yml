@@ -15,7 +15,7 @@ services:
           - node.hostname == akswnc4.aksw.uni-leipzig.de
       labels:
         traefik.docker.network: hbase
-        traefik.port: 60010
+        traefik.port: 16010
     env_file:
       - ./hbase.env
 
