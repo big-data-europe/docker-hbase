@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:
   hbase-master:
@@ -8,6 +8,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
       placement:
@@ -26,6 +27,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
       placement:
@@ -43,6 +45,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
       placement:
@@ -60,6 +63,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
       placement:
