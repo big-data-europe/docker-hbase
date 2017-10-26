@@ -1,11 +1,27 @@
-# How to run distributed version
+# How to run HBase in Docker Swarm
 
-First build the HBase docker images (from the root folder of repository):
+Docker Swarm deployment is more complex than the simple one-node deployment.
+Thus we split it in several stacks.
+After each step, make sure to check that the deployed stack works as intended.
+Also, the following stacks are part of production setup for InfAI (BDE partner) servers.
+In case, you deploy it on your servers, check the constraints and customize docker-compose and make files.
+
+We expose services using [Traefik](https://github.com/containous/traefik). To deploy traefik:
 ```
-make build
+make traefik
+```
+
+Deploy Hadoop:
+```
+make hadoop
+```
+
+Deploy Zookeeper:
+```
+make zookeeper
 ```
 
 Deploy HBase:
 ```
-docker stack deploy -c docker-compose.yml hbase
+make hbase
 ```
