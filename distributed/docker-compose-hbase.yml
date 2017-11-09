@@ -1,13 +1,14 @@
-version: '3'
+version: '3.2'
 
 services:
   hbase-master:
-    image: bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+    image: bde2020/hbase-master:1.0.0-hbase1.2.6
     networks:
       - hbase
     deploy:
       mode: replicated
       replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
       placement:
@@ -15,20 +16,63 @@ services:
           - node.hostname == akswnc4.aksw.uni-leipzig.de
       labels:
         traefik.docker.network: hbase
-        traefik.port: 60010
+        traefik.port: 16010
     env_file:
       - ./hbase.env
 
-  hbase-regionserver:
-    image: bde2020/hbase-hregionserver:1.0.0-hbase1.2.6
+  hbase-regionserver-1:
+    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
     networks:
       - hbase
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc4.aksw.uni-leipzig.de
     env_file:
       - ./hbase.env
+    environment:
+      HBASE_CONF_hbase_regionserver_hostname: hbase-regionserver-1
+
+  hbase-regionserver-2:
+    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    networks:
+      - hbase
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc5.aksw.uni-leipzig.de
+    env_file:
+      - ./hbase.env
+    environment:
+      HBASE_CONF_hbase_regionserver_hostname: hbase-regionserver-2
+
+  hbase-regionserver-3:
+    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    networks:
+      - hbase
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == akswnc6.aksw.uni-leipzig.de
+    env_file:
+      - ./hbase.env
+    environment:
+      HBASE_CONF_hbase_regionserver_hostname: hbase-regionserver-3
 
 networks:
   hbase:
