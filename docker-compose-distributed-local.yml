@@ -67,7 +67,7 @@ services:
       - 2181:2181
 
   hbase-master:
-    image: bde2020/hbase-hmaster:1.0.0-hbase1.2.6
+    image: bde2020/hbase-master:1.0.0-hbase1.2.6
     container_name: hbase-master
     hostname: hbase-master
     env_file:
