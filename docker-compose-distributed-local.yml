@@ -75,6 +75,7 @@ services:
     environment:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 zoo:2181"
     ports:
+      - 16000:16000
       - 16010:16010
 
   hbase-region:
@@ -87,6 +88,7 @@ services:
       HBASE_CONF_hbase_regionserver_hostname: hbase-region
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 zoo:2181 hbase-master:16010"
     ports:
+      - 16020:16020
       - 16030:16030
 
 volumes:
