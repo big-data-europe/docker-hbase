@@ -2,7 +2,7 @@ version: '3'
 
 services:
   namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     networks:
       - hbase
     volumes:
@@ -21,10 +21,10 @@ services:
           - node.hostname == akswnc4.aksw.uni-leipzig.de
       labels:
         traefik.docker.network: hbase
-        traefik.port: 50070
+        traefik.port: 9870
 
   datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     networks:
       - hbase
     volumes:
@@ -32,21 +32,21 @@ services:
     env_file:
       - ./hadoop.env
     environment:
-      SERVICE_PRECONDITION: "namenode:50070"
+      SERVICE_PRECONDITION: "namenode:9870"
     deploy:
       mode: global
       restart_policy:
         condition: on-failure
       labels:
         traefik.docker.network: hbase
-        traefik.port: 50075
+        traefik.port: 9864
 
   resourcemanager:
-    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop2.7.4-java8
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     networks:
       - hbase
     environment:
-      SERVICE_PRECONDITION: "namenode:50070 datanode:50075"
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     env_file:
       - ./hadoop.env
     deploy:
@@ -64,11 +64,11 @@ services:
       disable: true
 
   nodemanager:
-    image: bde2020/hadoop-nodemanager:2.0.0-hadoop2.7.4-java8
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     networks:
       - hbase
     environment:
-      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
       - ./hadoop.env
     deploy:
@@ -80,13 +80,13 @@ services:
         traefik.port: 8042
 
   historyserver:
-    image: bde2020/hadoop-historyserver:2.0.0-hadoop2.7.4-java8
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     networks:
       - hbase
     volumes:
       - hadoop_historyserver:/hadoop/yarn/timeline
     environment:
-      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
       - ./hadoop.env
     deploy:
