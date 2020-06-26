@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   hbase-master:
-    image: bde2020/hbase-master:1.0.0-hbase1.2.6
+    image: bde2020/hbase-master:2.0.0-hbase2.2.5
     networks:
       - hbase
     deploy:
@@ -21,7 +21,7 @@ services:
       - ./hbase.env
 
   hbase-regionserver-1:
-    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    image: bde2020/hbase-regionserver:2.0.0-hbase2.2.5
     networks:
       - hbase
     deploy:
@@ -39,7 +39,7 @@ services:
       HBASE_CONF_hbase_regionserver_hostname: hbase-regionserver-1
 
   hbase-regionserver-2:
-    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    image: bde2020/hbase-regionserver:2.0.0-hbase2.2.5
     networks:
       - hbase
     deploy:
@@ -57,7 +57,7 @@ services:
       HBASE_CONF_hbase_regionserver_hostname: hbase-regionserver-2
 
   hbase-regionserver-3:
-    image: bde2020/hbase-regionserver:1.0.0-hbase1.2.6
+    image: bde2020/hbase-regionserver:2.0.0-hbase2.2.5
     networks:
       - hbase
     deploy:
