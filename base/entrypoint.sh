@@ -1,13 +1,24 @@
 #!/bin/bash
 
-function addProperty() {
+function setProperty() {
+  # Sets/unsets property value in an XML configuration file
+  # Usage:
+  # * Append/update: `setProperty filePath propName propValue` 
+  # * Delete: `setProperty filePath propName` 
   local path=$1
   local name=$2
   local value=$3
 
-  local entry="<property><name>$name</name><value>${value}</value></property>"
-  local escapedEntry=$(echo $entry | sed 's/\//\\\//g')
-  sed -i "/<\/configuration>/ s/.*/${escapedEntry}\n&/" $path
+  local wrappedName="<name>$name</name>"
+  local escapedName=${wrappedName//\//\\/} # https://stackoverflow.com/a/27788661
+  if [ -z "$value" ]; then
+    sed -i "/${escapedName}/d" $path
+  else
+    local entry="<property>$wrappedName<value>$value</value></property>"
+    local escapedEntry=${entry//\//\\/}
+    # https://superuser.com/a/590666
+    grep -q "${wrappedName}" $path && sed -i "/${escapedName}/c ${escapedEntry}" $path || sed -i "/<\/configuration>/ s/.*/${escapedEntry}\n&/" $path
+  fi
 }
 
 function configure() {
@@ -24,7 +35,7 @@ function configure() {
         var="${envPrefix}_${c}"
         value=${!var}
         echo " - Setting $name=$value"
-        addProperty /etc/hbase/$module-site.xml $name "$value"
+        setProperty /etc/hbase/$module-site.xml $name "$value"
     done
 }
 
